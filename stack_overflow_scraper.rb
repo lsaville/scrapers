@@ -8,7 +8,6 @@ class StackOverflowScraper
   COMPANY_NAME_REGEX  = /at (.*?) \(/
   LOCATION_REGEX      = /\((.*?)\)/
 
-
   def initialize
     @conn = Faraday.new("http://stackoverflow.com/jobs/feed")
   end
@@ -28,7 +27,9 @@ class StackOverflowScraper
   end
 
   def format_entry(entry)
-    BaseScraper.create_payload(entry.css('title').text,
+    title = entry.css('title').text
+
+    BaseScraper.create_payload(title,
       entry.css('guid').text,
       generate_raw_technologies(entry),
       entry.css('description').text,
@@ -58,3 +59,5 @@ class StackOverflowScraper
   end
 
 end
+
+StackOverflowScraper.new.scrape
