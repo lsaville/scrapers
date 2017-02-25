@@ -3,9 +3,11 @@ require 'json'
 require 'pry'
 require 'bunny'
 require './secrets'
+require './technologies_module'
 
 class AuthenticScraper
   extend Secrets
+  include Technologies
 
   def initialize
     @queue = create_queue
@@ -43,11 +45,19 @@ class AuthenticScraper
 
   private
 
+  def pull_technologies(description)
+    Technologies.technologies_list.select do |tech|
+      regex = /\b#{tech}\b/i
+      regex.match(description)
+    end
+  end
+
   def format_job(job)
     location_name = job[:company][:location][:name] if job[:company][:location]
     { job: {
         title: job[:title],
         url: job[:url],
+        raw_technologies: pull_technologies(job[:description]),
         description: job[:description],
         published: job[:post_date]
       },
@@ -86,6 +96,7 @@ class AuthenticScraper
   end
 
   def publish_data(data)
+    binding.pry
     @queue.publish(data.to_json)
   end
 end
