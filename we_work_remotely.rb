@@ -1,18 +1,12 @@
-require 'nokogiri'
-require 'faraday'
-require 'json'
-require 'bunny'
-require 'pry'
-
 require_relative('technologies_module')
-
+require_relative('base_scraper_module')
 
 class WeWorkRemotelyScraper
-  include Technologies
+  include Technologies, BaseScraper
   attr_reader :queue, :conn
 
   def initialize
-    @queue = create_queue
+    @queue = BaseScraper.create_queue
     @conn = Faraday.new("https://weworkremotely.com/categories/2-programming/jobs.rss")
   end
 
@@ -21,24 +15,7 @@ class WeWorkRemotelyScraper
   NEWLINES_OR_TABS   = /\n+|\t+/
   ESCAPED_QUOTES     = "\""
 
-  def create_queue
-    connection = Bunny.new(
-      :host => 'monocle.turing.io',
-      :port => '5672',
-      :user => 'monocle',
-      :pass => 'RzoCoV7GR2wGAb'
-    )
-    connection.start
-    channel = connection.create_channel
-    channel.queue('scrapers.to.lookingfor')
-  end
 
-  def scrape
-    feed = pull_feed
-    if feed
-      format_entries(feed)
-    end
-  end
 
   def format_entries(entries)
     entries.css('item').map do |entry|
