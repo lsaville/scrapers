@@ -12,5 +12,9 @@
 application.yml
 .idea
 
+# Ignore secrets file
+secrets.rb
+.idea
+
 
 .DS_Store
