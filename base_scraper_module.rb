@@ -18,19 +18,12 @@ module BaseScraper
     channel.queue('scrapers.to.lookingfor')
   end
 
-  def self.scrape
-    feed = pull_feed
-    if feed
-      format_entries(feed)
-    end
-  end
-
-  def self.pull_feed
+  def self.pull_feed(conn)
     Nokogiri::HTML(conn.get.body)
   end
 
   def self.push_to_queue(entry)
-    queue.publish(entry.to_json)
+    create_queue.publish(entry.to_json)
   end
 
   def self.create_payload(title,
@@ -57,6 +50,14 @@ module BaseScraper
         name: location,
       }
     }
+  end
+
+  def self.pull_location(summary, regex)
+    regex.match(summary)[1] rescue ''
+  end
+
+  def self.pull_company_name(title, regex)
+    regex.match(title)[1] rescue ''
   end
 
 end

@@ -3,18 +3,25 @@ require_relative('base_scraper_module')
 
 class WeWorkRemotelyScraper
   include Technologies, BaseScraper
-  attr_reader :queue, :conn
-
-  def initialize
-    @queue = BaseScraper.create_queue
-    @conn = Faraday.new("https://weworkremotely.com/categories/2-programming/jobs.rss")
-  end
+  attr_reader :conn
 
   DIVS_OR_LIS        = /<\/div>|<li>/
   NONBREAKING_SPACES = /&nbsp;/
   NEWLINES_OR_TABS   = /\n+|\t+/
   ESCAPED_QUOTES     = "\""
+  HEADQUARTERS_REGEX = /Headquarters: (.*)\s* URL/
+  COMPANY_NAME_REGEX = /(.*):/
 
+  def initialize
+    @conn = Faraday.new("https://weworkremotely.com/categories/2-programming/jobs.rss")
+  end
+
+  def scrape
+    feed = BaseScraper.pull_feed(conn)
+    if feed
+      format_entries(feed)
+    end
+  end
 
   def format_entries(entries)
     entries.css('item').map do |entry|
@@ -24,14 +31,17 @@ class WeWorkRemotelyScraper
   end
 
   def format_entry(entry)
-    BaseScraper.create_payload(entry.css('title').text,
+    description = entry.css('description').text
+    title = entry.css('title').text
+
+    BaseScraper.create_payload(title,
       entry.css('guid').text,
       pull_technologies(description),
-      entry.css('description').text,
+      description,
       true,
       entry.css('pubdate').text,
-      pull_company_name(title),
-      pull_location(description)
+      BaseScraper.pull_company_name(title, COMPANY_NAME_REGEX),
+      BaseScraper.pull_location(description, HEADQUARTERS_REGEX)
     )
   end
 
@@ -40,22 +50,11 @@ class WeWorkRemotelyScraper
     Nokogiri::HTML(summary).text
   end
 
-  def pull_location(summary)
-    regex = /Headquarters: (.*)\s* URL/
-
-    regex.match(summary)[1] rescue ''
-  end
-
   def pull_technologies(description)
     Technologies.technologies_list.select do |tech|
       regex = /\b#{tech}\b/i
       regex.match(description)
     end
-  end
-
-  def pull_company_name(title)
-    regex = /(.*):/
-    regex.match(title)[1] rescue ''
   end
 
   def pull_description(summary)
