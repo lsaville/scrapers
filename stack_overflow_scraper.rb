@@ -52,6 +52,7 @@ class StackOverflowScraper
     url_address = entry.css('guid').text
     location = entry.css('location').text
     description = entry.css('description').text
+    
     { job: {
         title: title,
         url: url_address,
