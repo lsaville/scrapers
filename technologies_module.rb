@@ -16,7 +16,12 @@ module Technologies
       "css",
       "elixir",
       "java",
-      "python"
+      "python",
+      "php",
+      "sql",
+      "perl",
+      "scala"
+
     ]
   end
 
