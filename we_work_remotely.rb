@@ -16,48 +16,24 @@ class WeWorkRemotelyScraper
   ESCAPED_QUOTES     = "\""
 
 
-
   def format_entries(entries)
     entries.css('item').map do |entry|
       formatted_entry = format_entry(entry)
-      push_to_queue(formatted_entry)
+      BaseScraper.push_to_queue(formatted_entry)
     end
   end
 
-  def push_to_queue(entry)
-    queue.publish(entry.to_json)
-  end
-
-  def pull_feed
-    Nokogiri::HTML(conn.get.body)
-  end
-
   def format_entry(entry)
-    title = entry.css('title').text
-    url_address = entry.css('guid').text
-    description = entry.css('description').text
-    location = pull_location(description)
-    posted_date = entry.css('pubdate').text
-    technologies = pull_technologies(description)
-    company_name = pull_company_name(title)
-
-    { job: {
-        title: title,
-        url: url_address,
-        raw_technologies: technologies,
-        description: description,
-        remote: true,
-        posted_date: posted_date
-      },
-      company: {
-        name: company_name
-      },
-      location: {
-        name: location,
-      }
-    }
+    BaseScraper.create_payload(entry.css('title').text,
+      entry.css('guid').text,
+      pull_technologies(description),
+      entry.css('description').text,
+      true,
+      entry.css('pubdate').text,
+      pull_company_name(title),
+      pull_location(description)
+    )
   end
-
 
   def strip_summary(summary)
     summary = summary.gsub(DIVS_OR_LIS, " ").gsub(NONBREAKING_SPACES,"")

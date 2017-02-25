@@ -25,4 +25,38 @@ module BaseScraper
     end
   end
 
+  def self.pull_feed
+    Nokogiri::HTML(conn.get.body)
+  end
+
+  def self.push_to_queue(entry)
+    queue.publish(entry.to_json)
+  end
+
+  def self.create_payload(title,
+    url_address,
+    technologies,
+    description,
+    remote,
+    posted_date,
+    company_name,
+    location
+  )
+    { job: {
+        title: title,
+        url: url_address,
+        raw_technologies: technologies,
+        description: description,
+        remote: remote,
+        posted_date: posted_date
+      },
+      company: {
+        name: company_name
+      },
+      location: {
+        name: location,
+      }
+    }
+  end
+
 end
