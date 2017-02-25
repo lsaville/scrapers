@@ -15,7 +15,8 @@ module Technologies
       "html",
       "css",
       "elixir",
-      "java"
+      "java",
+      "python"
     ]
   end
 

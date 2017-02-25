@@ -59,11 +59,14 @@ class Scraper
   def scrape_job_page(link)
     page = @conn.get link
     parsed_page = Nokogiri::HTML(page.body)
-    job = {
+    job = { job: {
       title: parsed_page.css('.nj-job-title').text.strip,
-      company: parsed_page.css('.nc-fallback-title').text.strip,
       description: parsed_page.css('.nj-job-body').to_html,
-      url: "http://www.builtincolorado.com#{link}",
+      url: "http://www.builtincolorado.com#{link}"
+      },
+      company: {
+        name: parsed_page.css('.nc-fallback-title').text.strip
+      }
     }
     job.to_json
   end
