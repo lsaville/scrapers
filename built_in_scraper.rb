@@ -2,8 +2,11 @@ require 'faraday'
 require 'nokogiri'
 require 'json'
 require 'bunny'
+require 'location_finder'
 
 class Scraper
+  include LocationFinder
+  
   def initialize
     @queue = create_queue
     @conn  = create_conn
