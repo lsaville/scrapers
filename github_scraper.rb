@@ -38,7 +38,7 @@ class GithubScraper
           title: job[:title],
           description: job[:description],
           url: job[:url],
-          posted_date: job[:created_at],
+          published: job[:created_at],
         },
         company: {
           name: job[:company]
