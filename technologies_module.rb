@@ -10,6 +10,12 @@ module Technologies
       "clojure",
       "angular",
       "rails",
+      "python",
+      "jquery",
+      "html",
+      "css",
+      "elixir",
+      "java",
       "python"
     ]
   end
