@@ -68,5 +68,4 @@ class WeWorkRemotelyScraper
 
 end
 
-
 WeWorkRemotelyScraper.new.scrape
