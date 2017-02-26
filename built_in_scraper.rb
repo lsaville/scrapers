@@ -66,6 +66,9 @@ class Scraper
       },
       company: {
         name: parsed_page.css('.nc-fallback-title').text.strip
+      },
+      location: {
+        name: 'Denver'
       }
     }
     job.to_json
