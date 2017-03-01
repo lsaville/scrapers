@@ -4,27 +4,33 @@ require 'pry'
 require 'bunny'
 require './secrets'
 require './technologies_module'
+require_relative 'publisher'
 
 class AuthenticScraper
   extend Secrets
   include Technologies
 
+  attr_reader :publisher
+
   def initialize
-    @queue = create_queue
+    @publisher = Publisher.new
   end
-
-  def create_queue
-    connection = Bunny.new(
-      :host => 'monocle.turing.io',
-      :port => '5672',
-      :user => 'monocle',
-      :pass => 'RzoCoV7GR2wGAb'
-    )
-
-    connection.start
-    channel = connection.create_channel
-    channel.queue('scrapers.to.lookingfor')
-  end
+  # def initialize
+  #   @queue = create_queue
+  # end
+  #
+  # def create_queue
+  #   connection = Bunny.new(
+  #     :host => 'monocle.turing.io',
+  #     :port => '5672',
+  #     :user => 'monocle',
+  #     :pass => 'RzoCoV7GR2wGAb'
+  #   )
+  #
+  #   connection.start
+  #   channel = connection.create_channel
+  #   channel.queue('scrapers.to.lookingfor')
+  # end
 
   def self.scrape
     scraper = AuthenticScraper.new
@@ -96,8 +102,7 @@ class AuthenticScraper
   end
 
   def publish_data(data)
-    binding.pry
-    @queue.publish(data.to_json)
+    publisher.publish(data)
   end
 end
 
