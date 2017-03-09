@@ -30,7 +30,7 @@ class StackOverflowScraper
     title = entry.css('title').text
 
     BaseScraper.create_payload(title,
-      entry.css('guid').text,
+      entry.children[2].text,
       generate_raw_technologies(entry),
       entry.css('description').text,
       is_remote?(title),
